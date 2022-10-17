@@ -1,0 +1,31 @@
+services:
+  mysql:
+    image: mariadb:10.9.3
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./paste.sql:/docker-entrypoint-initdb.d/paste.sql
+    env_file:
+      - .env
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config.yaml:/app/config.yaml
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    ports:
+      - 8090:80
+    environment:
+      - PMA_HOST=mysql
+    depends_on:
+      - mysql
+volumes:
+  mysql:

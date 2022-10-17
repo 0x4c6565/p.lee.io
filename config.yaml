@@ -1,0 +1,104 @@
+---
+debug: true
+syntax_default: None
+syntax:
+- label: "None"
+  syntax: "text/plain"
+- label: "ASP.NET"
+  syntax: "application/x-aspx"
+- label: "BASH"
+  syntax: "text/x-sh"
+- label: "C"
+  syntax: "text/x-csrc"
+- label: "C#"
+  syntax: "text/x-csharp"
+- label: "C++"
+  syntax: "text/x-c++src"
+- label: "CoffeeScript"
+  syntax: "text/x-coffeescript"
+- label: "CSS"
+  syntax: "text/css"
+- label: "Django"
+  syntax: "text/x-django"
+- label: "Dockerfile"
+  syntax: "text/x-dockerfile"
+- label: "Erlang"
+  syntax: "text/x-erlang"
+- label: "Go"
+  syntax: "text/x-go"
+- label: "HTML"
+  syntax: "text/html"
+- label: "HTML+PHP"
+  syntax: "application/x-httpd-php"
+- label: "HTTP"
+  syntax: "message/http"
+- label: "Java"
+  syntax: "text/x-java"
+- label: "JavaScript"
+  syntax: "text/javascript"
+- label: "Jinja2"
+  syntax: "jinja2"
+- label: "JSON"
+  syntax: "application/ld+json"
+  aliases	:
+  - "application/json"
+- label: "Lua"
+  syntax: "text/x-lua"
+- label: "Markdown"
+  syntax: "text/x-markdown"
+- label: "MySQL"
+  syntax: "text/x-mysql"
+- label: "MSSQL"
+  syntax: "text/x-mssql"
+- label: "Nginx"
+  syntax: "text/nginx"
+- label: "Objective C"
+  syntax: "text/x-objectivec"
+- label: "Perl"
+  syntax: "text/x-perl"
+- label: "PHP"
+  syntax: "text/x-php"
+- label: "PostgreSQL"
+  syntax: "text/x-pgsql"
+- label: "PowerShell"
+  syntax: "application/x-powershell"
+- label: "Puppet"
+  syntax: "text/x-puppet"
+- label: "Python"
+  syntax: "text/x-python"
+- label: "R"
+  syntax: "text/x-rsrc"
+- label: "reStructuredText"
+  syntax: "text/x-rst"
+- label: "Ruby"
+  syntax: "text/x-ruby"
+- label: "Rust"
+  syntax: "text/x-rustsrc"
+- label: "Sass"
+  syntax: "text/x-sass"
+- label: "SQL"
+  syntax: "text/x-sql"
+- label: "Swift"
+  syntax: "text/x-swift"
+- label: "VB.NET"
+  syntax: "text/x-vb"
+- label: "XML"
+  syntax: "application/xml"
+- label: "YAML"
+  syntax: "text/x-yaml"
+expires_default: 1 week
+expires:
+- label: 10 min
+  expires: 600
+- label: 30 min
+  expires: 1800
+- label: 1 hour
+  expires: 3600
+- label: 6 hours
+  expires: 21600
+- label: 24 hours
+  expires: 86400
+- label: 1 week
+  expires: 604800
+- label: 1 month
+  expires: 2419200

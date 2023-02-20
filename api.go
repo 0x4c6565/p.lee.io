@@ -72,7 +72,10 @@ func (h *API) Start(ctx context.Context) error {
 	h.router.HandleFunc("/api/v1/paste", h.HandleCreatePaste).Methods("POST")
 	h.router.HandleFunc(`/api/v1/syntax`, h.HandleGetSyntax).Methods("GET")
 	h.router.HandleFunc(`/api/v1/expires`, h.HandleGetExpires).Methods("GET")
-	h.router.HandleFunc(`/raw/{uuid:\S+}`, h.HandleGetPasteRaw).Methods("GET")
+	// h.router.HandleFunc(`/raw/{uuid:\S+}`, h.HandleGetPasteRaw).Methods("GET")
+	h.router.PathPrefix(`/raw/{uuid:[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}}`).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/raw.html")
+	})).Methods("GET")
 	h.router.PathPrefix(`/{uuid:[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}}`).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/index.html")
 	})).Methods("GET")
@@ -146,26 +149,37 @@ func (h *API) getPaste(uuid string) (pasteResponse, *apiError) {
 
 func (h *API) HandleGetPaste(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	resp, err := h.getPaste(vars["uuid"])
+
+	paste, err := h.storage.Get(context.Background(), vars["uuid"])
 	if err != nil {
-		h.handleJSONResponse(w, err.Code, err.Err.Error())
+		var notFoundErr *storage.NotFoundError
+		if errors.As(err, &notFoundErr) {
+			h.handleJSONResponse(w, http.StatusNotFound, "Cannot find paste")
+			return
+		}
+
+		log.Error().Msgf("Error retrieving paste: %s", err.Error())
+		h.handleJSONResponse(w, http.StatusInternalServerError, nil)
+		return
 	}
 
-	h.handleJSONResponse(w, http.StatusOK, resp)
-}
-
-func (h *API) HandleGetPasteRaw(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	resp, err := h.getPaste(vars["uuid"])
-	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(err.Code)
-		w.Write([]byte(err.Err.Error()))
+	burnt := false
+	if paste.Expires == model.PASTE_EXPIRES_BURN {
+		err = h.storage.Delete(context.Background(), paste.ID)
+		if err != nil {
+			log.Error().Msgf("Error burning paste: %s", err.Error())
+			h.handleJSONResponse(w, http.StatusInternalServerError, nil)
+			return
+		}
+		burnt = true
 	}
 
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(resp.Content))
+	h.handleJSONResponse(w, http.StatusOK, &pasteResponse{
+		Expires: paste.Expires,
+		Syntax:  paste.Syntax,
+		Content: paste.Content,
+		Burnt:   burnt,
+	})
 }
 
 func (h *API) HandleCreatePaste(w http.ResponseWriter, r *http.Request) {

@@ -530,7 +530,6 @@ function initExpires() {
             toastr.error(msg, null, {timeOut: 2000, extendedTimeOut: 1000});
         },
         success: function(data, textStatus, jqXHR) {
-            console.log(data)
             for (let i=0; i < data.length; i++) {
                 var option = document.createElement("option");
                 option.text = data[i].label;

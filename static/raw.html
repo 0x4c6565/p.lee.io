@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://static.lee.io/js/hashparams.js"></script>
+    <script src="https://static.lee.io/js/jquery/1.9.1/jquery.min.js"></script>
+    <script src="/js/crypto/core-min.js"></script>
+    <script src="/js/crypto/enc-utf16-min.js"></script>
+    <script src="/js/crypto/enc-base64-min.js"></script>
+    <script src="/js/crypto/aes.js"></script>
+    <style>
+        body {
+            display: block;
+            font-family: monospace;
+            white-space: pre;
+            margin: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function getPaste(uuid) {
+            var encryptionKey = HashParameters.get("encryptionKey");
+            $.ajax({
+                url: '/api/v1/paste/' + uuid,
+                timeout: 90000,
+                type: 'GET',
+                dataType: "json",
+                contentType: 'application/json',
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var msg = jqXHR.responseText;
+                    console.log("1", msg)
+                    try {
+                        msg = JSON.parse(msg);
+                        console.log("2", msg)
+                    } catch { }
+
+                    document.body.textContent = 'Error: ' + msg;
+                },
+                success: function (data, textStatus, jqXHR) {
+                    if (encryptionKey != undefined && encryptionKey != null) {
+                        document.body.textContent = '' + CryptoJS.AES.decrypt(data.content, encryptionKey).toString(CryptoJS.enc.Utf8);
+                    } else {
+                        document.body.textContent = data.content;
+                    }
+                }
+            });
+        }
+
+        var uuidMatch = window.location.pathname.match(/raw\/([a-zA-Z0-9-]+)/);
+        if (uuidMatch != null) {
+            getPaste(uuidMatch[1]);
+        }
+    </script>
+</body>

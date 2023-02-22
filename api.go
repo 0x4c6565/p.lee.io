@@ -108,45 +108,6 @@ func (h *API) Start(ctx context.Context) error {
 	return nil
 }
 
-func (h *API) getPaste(uuid string) (pasteResponse, *apiError) {
-	paste, err := h.storage.Get(context.Background(), uuid)
-	if err != nil {
-		var notFoundErr *storage.NotFoundError
-		if errors.As(err, &notFoundErr) {
-			return pasteResponse{}, &apiError{
-				Err:  errors.New("Cannot find paste"),
-				Code: http.StatusNotFound,
-			}
-		}
-
-		log.Error().Msgf("Error retrieving paste: %s", err.Error())
-		return pasteResponse{}, &apiError{
-			Err:  nil,
-			Code: http.StatusInternalServerError,
-		}
-	}
-
-	burnt := false
-	if paste.Expires == model.PASTE_EXPIRES_BURN {
-		err = h.storage.Delete(context.Background(), paste.ID)
-		if err != nil {
-			log.Error().Msgf("Error burning paste: %s", err.Error())
-			return pasteResponse{}, &apiError{
-				Err:  nil,
-				Code: http.StatusInternalServerError,
-			}
-		}
-		burnt = true
-	}
-
-	return pasteResponse{
-		Expires: paste.Expires,
-		Syntax:  paste.Syntax,
-		Content: paste.Content,
-		Burnt:   burnt,
-	}, nil
-}
-
 func (h *API) HandleGetPaste(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

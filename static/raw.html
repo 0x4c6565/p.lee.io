@@ -29,10 +29,8 @@
                 contentType: 'application/json',
                 error: function (jqXHR, textStatus, errorThrown) {
                     var msg = jqXHR.responseText;
-                    console.log("1", msg)
                     try {
                         msg = JSON.parse(msg);
-                        console.log("2", msg)
                     } catch { }
 
                     document.body.textContent = 'Error: ' + msg;

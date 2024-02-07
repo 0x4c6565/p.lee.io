@@ -486,7 +486,7 @@ function setSelect(select, val) {
 }
 
 function initSyntax() {
-    $.ajax({
+    return $.ajax({
         url: '/api/v1/syntax',
         timeout: 10000,
         type: 'GET',
@@ -515,7 +515,7 @@ function initSyntax() {
 }
 
 function initExpires() {
-    $.ajax({
+    return $.ajax({
         url: '/api/v1/expires',
         timeout: 10000,
         type: 'GET',
@@ -544,7 +544,9 @@ function initExpires() {
 }
 
 function init() {
-    initSyntax()
-    initExpires()
-    invokeGetPaste()
+    let s = initSyntax()
+    let e = initExpires()
+    Promise.all([s,e]).then(function () {
+        invokeGetPaste()
+    })
 }

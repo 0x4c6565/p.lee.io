@@ -35,7 +35,7 @@ type ConfigSyntax struct {
 
 type ConfigExpires struct {
 	Label   string `mapstructure:"label"`
-	Expires int    `mapstructure:"expires"`
+	Expires int64  `mapstructure:"expires"`
 }
 
 func (c *Config) ResolveSyntax(s string) (bool, ConfigSyntax) {

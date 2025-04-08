@@ -43,7 +43,7 @@ type syntaxResponse struct {
 type expiresResponse struct {
 	Label   string `json:"label"`
 	Default bool   `json:"default,omitempty"`
-	Expires int    `json:"expires"`
+	Expires int64  `json:"expires"`
 }
 
 type apiError struct {

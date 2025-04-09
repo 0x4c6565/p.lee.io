@@ -38,24 +38,6 @@ type ConfigExpires struct {
 	Expires int64  `mapstructure:"expires"`
 }
 
-func (c *Config) ResolveSyntax(s string) (bool, ConfigSyntax) {
-	for _, syntax := range c.Syntax {
-		if syntax.Syntax == s || inArray(syntax.Aliases, s) {
-			return true, syntax
-		}
-	}
-	return false, ConfigSyntax{}
-}
-
-func inArray(a []string, s string) bool {
-	for _, item := range a {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
 func InitConfig() (*Config, error) {
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")

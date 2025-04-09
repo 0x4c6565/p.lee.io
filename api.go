@@ -153,9 +153,15 @@ func (h *API) HandleCreatePaste(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	syntaxExists, syntax := h.config.ResolveSyntax(req.Syntax)
+	syntaxExists, syntax := resolveSyntax(h.config, req.Syntax)
 	if !syntaxExists {
 		h.handleJSONResponse(w, http.StatusBadRequest, "Invalid syntax")
+		return
+	}
+
+	expiresExists := expiresExists(h.config, req.Expires)
+	if !expiresExists && req.Expires != model.PASTE_EXPIRES_BURN && req.Expires != model.PASTE_EXPIRES_NEVER {
+		h.handleJSONResponse(w, http.StatusBadRequest, "Invalid expires")
 		return
 	}
 
@@ -215,4 +221,31 @@ func (h *API) handleJSONResponse(w http.ResponseWriter, statusCode int, content 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(content)
+}
+
+func resolveSyntax(c *Config, s string) (bool, ConfigSyntax) {
+	for _, syntax := range c.Syntax {
+		if syntax.Syntax == s || inArray(syntax.Aliases, s) {
+			return true, syntax
+		}
+	}
+	return false, ConfigSyntax{}
+}
+
+func expiresExists(c *Config, s int64) bool {
+	for _, expires := range c.Expires {
+		if expires.Expires == s {
+			return true
+		}
+	}
+	return false
+}
+
+func inArray(a []string, s string) bool {
+	for _, item := range a {
+		if item == s {
+			return true
+		}
+	}
+	return false
 }

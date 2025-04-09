@@ -1,9 +1,9 @@
-FROM golang:alpine3.16 AS builder
+FROM golang:1.24-alpine3.21 AS builder
 WORKDIR /build
 COPY . .
 RUN go build -o p.lee.io
 
-FROM alpine:3.16
+FROM alpine:3.21
 WORKDIR /app
 COPY --from=builder /build/p.lee.io .
 COPY static static
